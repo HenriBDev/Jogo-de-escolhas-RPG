@@ -1,146 +1,170 @@
-# -*- coding: UTF-8
-
 from random import randrange
 import os
-
-os.system('CLS')
-
+import shutil
 
 def main():
     CAMINHO_VERMELHO = 1
     CAMINHO_PRETO = 2
     tentativas = 7
     sala = 1
+    tentativaFuga = False
+
+    desenharSala(sala, tentativas, tentativaFuga)
 
     while (tentativas > 0 and sala != 9):
-
-        mostraVida(tentativas)
-        visualSalaPrincipal(sala)
 
         escolha = int(input())
 
         if ((escolha == CAMINHO_VERMELHO and sala != 6) or (escolha == CAMINHO_PRETO and sala != 8)):
             sala += escolha
-            os.system('CLS')
         elif sala == 8:
-            sala = randrange(1, 6)
-            os.system('CLS')
+            sala = selecionaNumAleatorio(1, 6)
         else:
-            os.system('CLS')
-            mensagemFuga()
+            tentativaFuga = True
+
+        limpaTela()
         tentativas -= 1
 
-    if(tentativas == 0 and sala != 9):
-        mensagemDerrota()
+        desenharSala(sala, tentativas, tentativaFuga)
+        tentativaFuga = False
+
+def desenharSala(sala, tentativas, fuga):
+
+    desenharMensagem(sala, tentativas, fuga)
+    desenharImagem(sala, tentativas)
+    desenharVidas(tentativas)
+
+def desenharMensagem(sala, tentativas, fuga):
+    printFormatado(tipoFormatacao = "linhaCheia",
+                   preenchimento = "=")
+
+    if sala == 9:
+        mensagem = [" Parabéns, bravo(a) guerreiro(a)! Você chegou ao final da masmorra. ",
+                    " Leve este troféu e lembre-se de sua conquista "]
+    elif tentativas == 0:
+        mensagem = [" Apesar de seus esforços, suas chances se esgotaram. ",
+                    " sua visão escurece, sua respiração pesa.. É O FIM! "]
     else:
-        mensagemVitoria(sala)
+        if fuga:
+            mensagem = [" ESTÁ TENTANDO DESRESPEITAR AS REGRAS? NÃO VAI FUNCIONAR. ",
+                        " -1 TENTATIVA PARA VOCÊ!! "]
+        else:
+            mensagem = [" Bravo(a) guerreiro(a), você está na {}ª sala ".format(sala),
+                        " Escolha seu caminho, ou lamente eternamente "]
+            if sala == 6:
+                mensagem.append(" [2] - Caminho preto ")
+            else:
+                mensagem.append(" [1] - Caminho vermelho <-> [2] - Caminho preto ")
 
-def mostraVida(vidas):
+    printFormatado(tipoFormatacao = "alinhamento",
+                   texto = mensagem,
+                   alinhamento = "centralizado",
+                   preenchimento = "=")
+    
+    printFormatado(tipoFormatacao = "linhaCheia",
+                   preenchimento = "=")
 
-    print("".join(preencherLinha(tipoPreenchimento = "direita",
-                                 tamanhoPreenchimento = vidas,
-                                 preenchimento = "<3 ")))
+def desenharImagem(sala, tentativas):
+    imagem = ["@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@",
+              "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"]
 
+    if sala == 9:
+        imagem.extend(["@@  |                                         |  @@",
+                       "@@  |                                         |  @@",
+                       "@@  |               ____________              |  @@",
+                       "@@  |______________'._==_==_==_.'_____________|  @@",
+                       "@@  /              .-\:       /-.             \  @@",
+                       "@@ /              | (|:.      |) |             \ @@",
+                       "@@/                '-|:.      |-'               \@@",
+                       "@@                   \::.     /                  @@",
+                       "@@                    '::.  .'                   @@",
+                       "@@                      )  (                     @@",
+                       "@@                    _.'  '._                   @@",
+                       "@@                   '--------'                  @@",
+                       "@@                                               @@",
+                       "@@                                               @@"])
 
-def visualSalaPrincipal(sala):
-    print("\n\n===================================================")
-    print("====== Bravo guerreiro, você está na {}° sala ======".format(sala))
-    print("=== Escolha seu caminho, ou lamente eternamente ===")
-    print("==== [1]-Caminho Vermelho == [2]-Caminho Preto ====")
-    print("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-    print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-    print("@@                                               @@")
-    print("@@      __________             ____________      @@")
-    print("@@     /     _    \           /    ____    \     @@")
-    print("@@    /     / \    |         /    /_   \   /     @@")
-    print("@@    |     | |    \         |     /   /   |     @@")
-    print("@@    |     | |     |        |    /   /_   |     @@")
-    print("@@    |     \_/     |        |    \____/   /     @@")
-    print("@@    /_____________|        |_____________|     @@")
-    print("@@    \              \      /             /      @@")
-    print("@@     \              \    /             /       @@")
-    print("@@      \              \  /             /        @@")
-    print("@@       \              \/             /         @@")
-    print("@@                                               @@")
-    print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-    print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n")
+    elif tentativas == 0:
+        imagem.extend(["@@               _________________               @@",
+                       "@@           /  /                 \  \           @@",
+                       "@@          / \/                   \/ \          @@",
+                       "@@          \__|   XXX       XXX   |__/          @@",
+                       "@@             |   XXXX     XXXX   |             @@",
+                       "@@             |   XXXX     XXXX   |             @@",
+                       "@@             \__       X       __/             @@",
+                       "@@               |\     XXX     /|               @@",
+                       "@@               | |           | |               @@",
+                       "@@               | I I I I I I I |               @@",
+                       "@@               |  I I I I I I  |               @@",
+                       "@@               \_             _/               @@",
+                       "@@                 \_         _/                 @@",
+                       "@@                   \_______/                   @@"])
 
-    pass
+    else:
+        if sala == 6:
+            imagem.extend(["@@                 \____________/                @@",
+                           "@@                  |          |                 @@",
+                           "@@                  |   ____   |                 @@",
+                           "@@                  |  /_   \  |                 @@",
+                           "@@                  |   /   /  |                 @@",
+                           "@@                  |  /   /_  |                 @@",
+                           "@@                  |  \____/  |                 @@",
+                           "@@                  |          |                 @@",
+                           "@@                  |__________|                 @@",
+                           "@@                  /          \                 @@",
+                           "@@                 /            \                @@",
+                           "@@                /              \               @@",
+                           "@@               /                \              @@",
+                           "@@              /                  \             @@"])
+        else:
+            imagem.extend(["@@ |    ___________               __________   | @@",
+                           "@@ |   /           |             |          |  | @@",
+                           "@@ |  |       _    |             |  ____    |  | @@",
+                           "@@ |  |      / \    |            / /_   \   |  | @@",
+                           "@@ | /       | |    |           |   /   /   |  | @@",
+                           "@@ | |       | |    |  <===>    |  /   /_   |  | @@",
+                           "@@ | |       \_/    |    |      |  \____/   |  | @@",
+                           "@@ | |              |    |     /             | | @@",
+                           "@@ |_|______________|____|____|______________|_| @@",
+                           "@@ /  \__         /      |     \            /  \ @@",
+                           "@@/     \         \      |     /          /     \@@",
+                           "@@       \         \          /         _/       @@",
+                           "@@        \         \________/         /         @@",
+                           "@@         \                          /          @@"])
+    
+    imagem.extend(["@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@",
+                   "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"])
+               
+            
+    printFormatado(tipoFormatacao = "alinhamento",
+                   texto = imagem,
+                   alinhamento = "centralizado")
 
-def visualSala6():
+def desenharVidas(tentativas):
 
-    print("\n\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-    print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-    print("@@                                               @@")
-    print("@@                 \____________/                @@")
-    print("@@                  |          |                 @@")
-    print("@@                  |   ____   |                 @@")
-    print("@@                  |  /_   \  |                 @@")
-    print("@@                  |   /   /  |                 @@")
-    print("@@                  |  /   /_  |                 @@")
-    print("@@                  |  \____/  |                 @@")
-    print("@@                  |          |                 @@")
-    print("@@                  |__________|                 @@")
-    print("@@                  /          \                 @@")
-    print("@@                 /            \                @@")
-    print("@@                /              \               @@")
-    print("@@               /                \              @@")
-    print("@@              /                  \             @@")
-    print("@@                                               @@")
-    print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-    print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n")
+    printFormatado(tipoFormatacao = "linhaCheia",
+                   preenchimento = "=")
 
-def mensagemVitoria(sala):
-    print("========================================================")
-    print("==== Parabéns, bravo guerreiro! Você está na sala: {} ===".format(sala))
-    print("==== Leve este troféu e lembre-se de sua conquista =====\n")
-    print("@@@@@@@@@@@@@@@@@@@@@@")
-    print("@@@@@@@@@@@@@@@@@@@@@@")
-    print("@@   ____________   @@")
-    print("@@  '._==_==_==_.'  @@")
-    print("@@  .-\:       /-.  @@")
-    print("@@  | (|:.     |) | @@")
-    print("@@   '-|:.     |-'  @@")
-    print("@@     \::.    /    @@")
-    print("@@      '::. .'     @@")
-    print("@@        ) (       @@")
-    print("@@      _.' '._     @@")
-    print("@@     '-------'    @@")
-    print("@@@@@@@@@@@@@@@@@@@@@@")
-    print("@@@@@@@@@@@@@@@@@@@@@@\n")
+    printFormatado(tipoFormatacao = "alinhamento",
+                   texto = ["Vidas:"],
+                   alinhamento = "centralizado")
+    if tentativas > 0:            
+        vidas = [listParaString(["<3 "] * tentativas)]
+    else:
+        vidas = ["X_X"]
 
-def mensagemDerrota():
-    os.system('CLS')
-    print("========================================================")
-    print("== Apesar de seus esforços, suas chances se esgotaram ==")
-    print("==== Tudo escurece!! Sua respiração pesa!! É O FIM!! ===\n")
-    print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-    print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-    print("@@       _______________      @@")
-    print("@@      /               \     @@")
-    print("@@     /                 \    @@")
-    print("@@  /\/                   \/\ @@")
-    print("@@  \ |   XXXX     XXXX   | / @@")
-    print("@@   \|   XXXX     XXXX   |/  @@")
-    print("@@    |   XXX       XXX   |   @@")
-    print("@@    |                   |   @@")
-    print("@@    \__      XXX      __/   @@")
-    print("@@      |\     XXX     /|     @@")
-    print("@@      | |           | |     @@")
-    print("@@      | I I I I I I I |     @@")
-    print("@@      |  I I I I I I  |     @@")
-    print("@@      \_             _/     @@")
-    print("@@        \_         _/       @@")
-    print("@@          \_______/         @@")
-    print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-    print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n")
+    printFormatado(tipoFormatacao = "alinhamento",
+                   texto = vidas,
+                   alinhamento = "centralizado")
+    
+    printFormatado(tipoFormatacao = "linhaCheia",
+                   preenchimento = "=")
 
-def mensagemFuga():
-    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-    print("!!!!!!!! VOCÊ ESTÁ TENTANDO FUGIR DE MIM?? !!!!!!!!")
-    print("!!!!!! CONTINUE TENTANDO E NUNCA SAIRÁ DAQUI. !!!!!")
-    print("!!!!!!! UMA VIDA SERÁ LEVADA COMO LEMBRETE. !!!!!!!")
-    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+def limpaTela():
+    os.system("CLS")
+
+def selecionaNumAleatorio(numInicio, numFim):
+    return randrange(numInicio, numFim)
 
 def stringParaList(stringParaConversao):
     comprimentoString = len(stringParaConversao)
@@ -161,18 +185,28 @@ def printFormatado(tipoFormatacao, texto = None, alinhamento = None, preenchimen
     else:
         caracteresPreenchimento = stringParaList(preenchimento)
 
+    if texto == None:
+        textoFormatado = [" "]
+    else:
+        textoFormatado = [None] * len(texto)
+    cont = 0
+
     if tipoFormatacao == "alinhamento":
-        linhaListada = stringParaList(texto)
-        linhaFormatada = alinharConteudo(texto = linhaListada,
-                                         tipoAlinhamento = alinhamento,  
-                                         preenchimento = caracteresPreenchimento)
+        for linha in texto:
+            linha = stringParaList(linha)
+            textoFormatado[cont] = alinharConteudo(texto = linha,
+                                                   tipoAlinhamento = alinhamento,  
+                                                   preenchimento = caracteresPreenchimento)
+            cont += 1
+
     elif tipoFormatacao == "linhaCheia":
         larguraTerminal = shutil.get_terminal_size()[0]
-        linhaFormatada = preencherLinha(tipoPreenchimento = "direita",
-                                        tamanhoPreenchimento = larguraTerminal,
-                                        preenchimento = caracteresPreenchimento)
-
-    print(listParaString(linhaFormatada), end = "")
+        textoFormatado[0] = preencherLinha(tipoPreenchimento = "direita",
+                                           tamanhoPreenchimento = larguraTerminal,
+                                           preenchimento = caracteresPreenchimento)
+    
+    for linhaFormatada in textoFormatado:
+        print(listParaString(linhaFormatada), end = "")
 
 def preencherLinha(tipoPreenchimento, tamanhoPreenchimento, preenchimento, linha = None):
     if linha == None:
