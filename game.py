@@ -1,3 +1,5 @@
+# -*- coding: UTF-8
+
 from random import randrange
 import os
 
@@ -33,12 +35,11 @@ def main():
     else:
         mensagemVitoria(sala)
 
-
 def mostraVida(vidas):
-    cont = vidas
-    while(cont > 0):
-        print("<3 ", end="")
-        cont -= 1
+
+    print("".join(preencherLinha(tipoPreenchimento = "direita",
+                                 tamanhoPreenchimento = vidas,
+                                 preenchimento = "<3 ")))
 
 
 def visualSalaPrincipal(sala):
@@ -66,8 +67,7 @@ def visualSalaPrincipal(sala):
 
     pass
 
-
-def visualSala6():  # ?
+def visualSala6():
 
     print("\n\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
     print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
@@ -90,7 +90,6 @@ def visualSala6():  # ?
     print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
     print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n")
 
-
 def mensagemVitoria(sala):
     print("========================================================")
     print("==== Parabéns, bravo guerreiro! Você está na sala: {} ===".format(sala))
@@ -109,7 +108,6 @@ def mensagemVitoria(sala):
     print("@@     '-------'    @@")
     print("@@@@@@@@@@@@@@@@@@@@@@")
     print("@@@@@@@@@@@@@@@@@@@@@@\n")
-
 
 def mensagemDerrota():
     os.system('CLS')
@@ -137,7 +135,6 @@ def mensagemDerrota():
     print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
     print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n")
 
-
 def mensagemFuga():
     print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     print("!!!!!!!! VOCÊ ESTÁ TENTANDO FUGIR DE MIM?? !!!!!!!!")
@@ -145,6 +142,90 @@ def mensagemFuga():
     print("!!!!!!! UMA VIDA SERÁ LEVADA COMO LEMBRETE. !!!!!!!")
     print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
 
+def stringParaList(stringParaConversao):
+    comprimentoString = len(stringParaConversao)
+    listFinal = [None] * comprimentoString
+    posicaoAtual = 0
+    while posicaoAtual < comprimentoString:
+        listFinal[posicaoAtual] = stringParaConversao[posicaoAtual]
+        posicaoAtual += 1
+    return listFinal
+
+def listParaString(listParaConversao):
+    return "".join(listParaConversao)
+
+def printFormatado(tipoFormatacao, texto = None, alinhamento = None, preenchimento = None):
+
+    if preenchimento == None or preenchimento == "":
+        caracteresPreenchimento = [" "]
+    else:
+        caracteresPreenchimento = stringParaList(preenchimento)
+
+    if tipoFormatacao == "alinhamento":
+        linhaListada = stringParaList(texto)
+        linhaFormatada = alinharConteudo(texto = linhaListada,
+                                         tipoAlinhamento = alinhamento,  
+                                         preenchimento = caracteresPreenchimento)
+    elif tipoFormatacao == "linhaCheia":
+        larguraTerminal = shutil.get_terminal_size()[0]
+        linhaFormatada = preencherLinha(tipoPreenchimento = "direita",
+                                        tamanhoPreenchimento = larguraTerminal,
+                                        preenchimento = caracteresPreenchimento)
+
+    print(listParaString(linhaFormatada), end = "")
+
+def preencherLinha(tipoPreenchimento, tamanhoPreenchimento, preenchimento, linha = None):
+    if linha == None:
+        linha = [""]
+    cont = 1
+    caracterAtual = 0
+    while cont <= tamanhoPreenchimento:
+        if tipoPreenchimento == "esquerda":
+            linha.insert(0, preenchimento[caracterAtual])
+        elif tipoPreenchimento == "direita":
+            linha.append(preenchimento[caracterAtual])
+        cont += 1
+        caracterAtual += 1
+        if caracterAtual >= len(preenchimento):
+            caracterAtual = 0
+    return linha
+
+def alinharConteudo(texto, tipoAlinhamento, preenchimento):
+    larguraTerminal = shutil.get_terminal_size()[0]
+    totalCaracteres = len(texto)
+    if totalCaracteres < larguraTerminal:
+        espacamentoTotal = larguraTerminal - totalCaracteres
+        espacamentoEsquerdo = 0
+        espacamentoDireito = 0
+        cont = 1
+        linhaFormatada = texto
+        
+        if tipoAlinhamento == "centralizado":
+            espacamentoEsquerdo = espacamentoTotal // 2
+            if espacamentoTotal % 2 == 0:
+                espacamentoDireito = espacamentoTotal / 2
+            else:
+                espacamentoDireito = espacamentoTotal // 2 + 1
+        elif tipoAlinhamento == "direita":
+            espacamentoEsquerdo = espacamentoTotal
+        elif tipoAlinhamento == "esquerda":
+            espacamentoDireito = espacamentoTotal
+        
+        if tipoAlinhamento == "centralizado" or tipoAlinhamento == "direita":
+            linhaFormatada = preencherLinha(tipoPreenchimento = "esquerda",
+                                            tamanhoPreenchimento = espacamentoEsquerdo,
+                                            preenchimento = preenchimento,
+                                            linha = linhaFormatada)
+        
+        if tipoAlinhamento == "centralizado" or tipoAlinhamento == "esquerda":
+            linhaFormatada = preencherLinha(tipoPreenchimento = "direita",
+                                            tamanhoPreenchimento = espacamentoDireito,
+                                            preenchimento = preenchimento,
+                                            linha = linhaFormatada)
+
+        return linhaFormatada
+    else:
+        return texto
 
 if __name__ == "__main__":
     main()
